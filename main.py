@@ -9,6 +9,10 @@ load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# ===== ตรวจสอบค่า =====
+assert DISCORD_TOKEN is not None, "❌ DISCORD_TOKEN ไม่ถูกตั้งค่า"
+assert OPENAI_API_KEY is not None, "❌ OPENAI_API_KEY ไม่ถูกตั้งค่า"
+
 # ===== สร้าง Client OpenAI =====
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -25,11 +29,11 @@ async def on_ready():
 # ===== คำสั่ง !ask =====
 @bot.command()
 async def ask(ctx, *, question):
-    """ถามคำถามกับ ChatGPT"""
-    print(f"Received question: {question}")  # debug ว่าคำสั่งมาถึงบอทหรือไม่
+    """ถามคำถามกับ ChatGPT (GPT-3.5-turbo)"""
+    print(f"Received question: {question}")  # debug
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # หรือ gpt-4, gpt-3.5-turbo
+            model="gpt-3.5-turbo",  # ใช้ตัวฟรี / โควต้าถูกกว่า
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": question}
@@ -37,7 +41,7 @@ async def ask(ctx, *, question):
         )
         answer = response.choices[0].message.content
         await ctx.reply(answer)
-        print(f"Sent answer: {answer}")  # debug ว่าส่งข้อความกลับแล้ว
+        print(f"Sent answer: {answer}")  # debug
     except Exception as e:
         await ctx.reply(f"เกิดข้อผิดพลาด: {e}")
         print(f"Error: {e}")
