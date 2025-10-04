@@ -1,15 +1,20 @@
+import os
 import discord
 from discord.ext import commands
 from openai import OpenAI
+from dotenv import load_dotenv
 
-# ===== กำหนด TOKEN =====
-DISCORD_TOKEN = "MTQyNDAzNDE0MDM5OTA3OTQ1NQ.G8rWJW.QyneSNSb5h5xPTKGoxlYcR9nhy5UxPNHtDeclQ"  # ใส่ Token ของบอท Discord
-OPENAI_API_KEY = "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"    # ใส่ API key ของ OpenAI
+# ===== โหลดค่า Token จากไฟล์ .env =====
+load_dotenv()
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# ===== สร้าง Client =====
+# ===== สร้าง Client OpenAI =====
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+# ===== ตั้งค่า Discord Bot =====
 intents = discord.Intents.default()
-intents.message_content = True  # ให้บอทอ่านข้อความในช่องได้
+intents.message_content = True  # ให้บอทรู้จักข้อความ
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # ===== เมื่อบอทออนไลน์ =====
@@ -35,4 +40,4 @@ async def ask(ctx, *, question):
         await ctx.reply(f"เกิดข้อผิดพลาด: {e}")
 
 # ===== เริ่มบอท =====
-bot.run(MTQyNDAzNDE0MDM5OTA3OTQ1NQ.G8rWJW.QyneSNSb5h5xPTKGoxlYcR9nhy5UxPNHtDeclQ)
+bot.run(DISCORD_TOKEN)
