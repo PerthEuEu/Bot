@@ -1,33 +1,39 @@
 import os
-import requests
-from discord.ext import commands
 import discord
+from discord.ext import commands
+import requests
 
+# ===== Secrets =====
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 HF_API_KEY = os.environ["HF_API_TOKEN"]
 
+# ===== Bot setup =====
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-def ask_huggingface(prompt):
+# ===== Hugging Face query =====
+def ask_hf(prompt):
     url = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
     headers = {"Authorization": f"Bearer {HF_API_KEY}"}
     payload = {"inputs": prompt}
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code == 200:
-        data = response.json()
-        return data[0]['generated_text']
+    r = requests.post(url, headers=headers, json=payload)
+    if r.status_code == 200:
+        return r.json()[0]["generated_text"]
     else:
-        return f"เกิดข้อผิดพลาด: {response.status_code}"
+        return f"เกิดข้อผิดพลาด: {r.status_code}"
 
+# ===== Bot ready =====
 @bot.event
 async def on_ready():
-    print(f"บอทออนไลน์! ชื่อ: {bot.user}")
+    print(f"✅ Bot ออนไลน์แล้ว! ชื่อ: {bot.user}")
 
+# ===== Command !ask =====
 @bot.command()
 async def ask(ctx, *, question):
-    answer = ask_huggingface(question)
+    print("Received:", question)  # ตรวจสอบว่า bot ได้รับข้อความ
+    answer = ask_hf(question)
     await ctx.send(answer)
 
+# ===== Run bot =====
 bot.run(DISCORD_TOKEN)
